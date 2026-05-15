@@ -5,21 +5,183 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login – Amilia Care</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --green: #2A9D6E;
+  --green-dark: #1D7A52;
+  --green-light: #E6F5EF;
+  --border: #E8ECEB;
+  --text: #1A2420;
+  --text-muted: #6B8279;
+  --bg: #F5F7F6;
+  --surface: #fff;
+  --red-bg: #FCEBEB;
+  --red-border: #F09595;
+  --red-text: #A32D2D;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+/* subtle grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(42,157,110,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42,157,110,.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.auth-page { width: 100%; display: flex; align-items: center; justify-content: center; }
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.6rem 2.4rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 32px rgba(26,36,32,.07);
+  position: relative;
+}
+
+/* logo */
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1.2rem;
+  display: block;
+}
+.logo span { color: var(--green); }
+
+h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+/* role selector */
+.role-select { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+.role-btn {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .18s;
+  background: var(--bg);
+}
+.role-btn span { font-size: 24px; display: block; margin-bottom: 5px; }
+.role-btn p { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+.role-btn.active {
+  border-color: var(--green);
+  background: var(--green-light);
+}
+.role-btn.active p { color: var(--green-dark); }
+
+/* form */
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--text-muted); }
+.form-group input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border .15s;
+  background: var(--bg);
+  color: var(--text);
+}
+.form-group input:focus { border-color: var(--green); background: var(--surface); }
+.form-group input.error { border-color: var(--red-border); }
+
+/* forgot */
+.forgot { display: flex; justify-content: flex-end; margin-bottom: 1rem; }
+.forgot a { font-size: 13px; color: var(--green); text-decoration: none; }
+.forgot a:hover { text-decoration: underline; }
+
+/* button */
+.btn-primary {
+  width: 100%;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary:hover:not(:disabled) { background: var(--green-dark); }
+.btn-primary:active:not(:disabled) { transform: scale(.99); }
+.btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+/* spinner inside button */
+.btn-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* alert box */
+.alert {
+  display: none;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 13px;
+  margin-top: 12px;
+  text-align: center;
+}
+.alert.error { background: var(--red-bg); border: 1px solid var(--red-border); color: var(--red-text); }
+.alert.success { background: var(--green-light); border: 1px solid #9FE1CB; color: var(--green-dark); }
+
+/* divider */
+.divider { display: flex; align-items: center; gap: 12px; margin: 1.4rem 0 1rem; color: var(--text-muted); font-size: 12px; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* links */
+.auth-link { text-align: center; font-size: 13.5px; color: var(--text-muted); margin-bottom: 6px; }
+.auth-link a { color: var(--green); text-decoration: none; font-weight: 500; }
+.auth-link a:hover { text-decoration: underline; }
+</style>
 </head>
 <body>
 <div class="auth-page">
   <div class="auth-card">
-    <div class="logo">Amilia<span>Care</span></div>
+    <span class="logo">Amilia<span>Care</span></span>
     <h2>Welcome Back</h2>
     <p class="subtitle">Sign in to your account</p>
 
     <div class="role-select">
-      <div class="role-btn active" onclick="selectRole(this,'employee')">
+      <div class="role-btn active" id="role-employee" onclick="selectRole('employee')">
         <span>👩‍💼</span>
         <p>I'm a Worker</p>
       </div>
-      <div class="role-btn" onclick="selectRole(this,'employer')">
+      <div class="role-btn" id="role-employer" onclick="selectRole('employer')">
         <span>🏠</span>
         <p>I'm an Employer</p>
       </div>
@@ -27,50 +189,134 @@
 
     <div class="form-group">
       <label>Email Address</label>
-      <input type="email" id="email" placeholder="you@example.com">
+      <input type="email" id="email" placeholder="you@example.com" onkeydown="onEnter(event)">
     </div>
     <div class="form-group">
       <label>Password</label>
-      <input type="password" id="password" placeholder="••••••••">
-    </div>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
-      <a href="#" style="font-size:13px;color:var(--green);">Forgot password?</a>
+      <input type="password" id="password" placeholder="••••••••" onkeydown="onEnter(event)">
     </div>
 
-    <button class="btn-primary btn-full" onclick="handleLogin()">Sign In</button>
-
-    <div id="login-error" style="display:none;background:#FCEBEB;border:1px solid #F09595;border-radius:8px;padding:10px 14px;font-size:13px;color:#A32D2D;margin-top:12px;text-align:center;">
-      Invalid email or password. Please try again.
+    <div class="forgot">
+      <a href="#" onclick="handleForgot(event)">Forgot password?</a>
     </div>
+
+    <button class="btn-primary" id="login-btn" onclick="handleLogin()">
+      <span class="btn-spinner" id="btn-spinner"></span>
+      <span id="btn-text">Sign In</span>
+    </button>
+
+    <div class="alert error"   id="login-error"></div>
+    <div class="alert success" id="login-success"></div>
 
     <div class="divider"><span>or</span></div>
     <div class="auth-link">Don't have an account? <a href="register.html">Create one</a></div>
-    <div class="auth-link" style="margin-top:6px"><a href="admin.html" style="font-size:12px;color:var(--text-muted);">Admin Login →</a></div>
+    <div class="auth-link" style="margin-top:4px">
+      <a href="admin.html" style="font-size:12px;color:var(--text-muted)">Admin Login →</a>
+    </div>
   </div>
 </div>
 
 <script>
+// ── SUPABASE ──────────────────────────────────────────────
+const SUPABASE_URL = 'https://phoahudvrcelfrykoeuo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_s4Wljr3TEtjLRxNJ9DzRSw_17gtvoAb';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── ROLE TOGGLE ───────────────────────────────────────────
 let currentRole = 'employee';
-function selectRole(el, role) {
-  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
+function selectRole(role) {
   currentRole = role;
+  document.getElementById('role-employee').classList.toggle('active', role === 'employee');
+  document.getElementById('role-employer').classList.toggle('active', role === 'employer');
 }
-function handleLogin() {
-  const email = document.getElementById('email').value;
+
+// ── HELPERS ───────────────────────────────────────────────
+function showError(msg)   { hide('login-success'); show('login-error',   msg); }
+function showSuccess(msg) { hide('login-error');   show('login-success', msg); }
+function show(id, msg)    { const el = document.getElementById(id); el.textContent = msg; el.style.display = 'block'; }
+function hide(id)         { document.getElementById(id).style.display = 'none'; }
+
+function setLoading(on) {
+  const btn = document.getElementById('login-btn');
+  btn.disabled = on;
+  document.getElementById('btn-spinner').style.display = on ? 'block' : 'none';
+  document.getElementById('btn-text').textContent = on ? 'Signing in…' : 'Sign In';
+}
+
+function onEnter(e) { if (e.key === 'Enter') handleLogin(); }
+
+// ── LOGIN ─────────────────────────────────────────────────
+async function handleLogin() {
+  hide('login-error'); hide('login-success');
+
+  const email    = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
-  if (!email || !password) {
-    document.getElementById('login-error').style.display = 'block';
-    document.getElementById('login-error').textContent = 'Please fill in all fields.';
+
+  if (!email || !password) { showError('Please fill in all fields.'); return; }
+
+  setLoading(true);
+
+  const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    setLoading(false);
+    if (error.message.includes('Invalid login')) {
+      showError('Incorrect email or password. Please try again.');
+    } else if (error.message.includes('Email not confirmed')) {
+      showError('Please confirm your email address first. Check your inbox.');
+    } else {
+      showError(error.message);
+    }
     return;
   }
-  // Simulate: redirect based on role
-  if (currentRole === 'employee') {
-    window.location.href = 'employee-dashboard.html';
-  } else {
-    window.location.href = 'employer-dashboard.html';
-  }
+
+  // Fetch profile to get actual stored role
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', data.user.id)
+    .single();
+
+  const role = profile?.role || currentRole;
+
+  showSuccess('Logged in! Redirecting…');
+
+  setTimeout(() => {
+    if (role === 'employer') {
+      window.location.href = 'employer-dashboard.html';
+    } else {
+      window.location.href = 'employee-dashboard.html';
+    }
+  }, 800);
 }
+
+// ── FORGOT PASSWORD ────────────────────────────────────────
+async function handleForgot(e) {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  if (!email) { showError('Enter your email address above first.'); return; }
+
+  setLoading(true);
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/reset-password.html'
+  });
+  setLoading(false);
+
+  if (error) { showError(error.message); return; }
+  showSuccess('Password reset email sent! Check your inbox.');
+}
+
+// ── AUTO-REDIRECT IF ALREADY LOGGED IN ────────────────────
+(async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (session) {
+    const { data: profile } = await db
+      .from('profiles').select('role').eq('id', session.user.id).single();
+    const role = profile?.role || 'employee';
+    window.location.href = role === 'employer' ? 'employer-dashboard.html' : 'employee-dashboard.html';
+  }
+})();
 </script>
 </body>
 </html>
