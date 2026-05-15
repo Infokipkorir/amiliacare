@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post Your Profile – Amilia Care</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+body { background: var(--surface); }
+.top-nav { background: #fff; border-bottom: 1px solid var(--border); padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+.top-nav .logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
+.top-nav .logo span { color: var(--green); }
+.char-count { font-size: 11.5px; color: var(--text-muted); text-align: right; margin-top: 4px; }
+.char-count.error { color: #A32D2D; }
+.required { color: #E24B4A; }
+.info-note { background: #E1F5EE; border: 1px solid #9FE1CB; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--green-dark); margin-bottom: 1rem; }
+.age-warning { display: none; background: #FCEBEB; border: 1px solid #F09595; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #A32D2D; margin-top: 6px; }
+.exp-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; align-items: end; }
+.exp-row label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+.exp-row input, .exp-row select { padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13.5px; font-family: inherit; outline: none; width: 100%; }
+.exp-row input:focus, .exp-row select:focus { border-color: var(--green); }
+.add-exp-btn { background: none; border: 1.5px dashed var(--green); color: var(--green); padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: inherit; transition: background .2s; }
+.add-exp-btn:hover { background: var(--green-light); }
+.remove-exp { background: none; border: none; color: #E24B4A; font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1; }
+.section-num { width: 28px; height: 28px; background: var(--green); color: #fff; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+.form-section h3 { display: flex; align-items: center; }
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <a href="index.html" class="logo">Amilia<span>Care</span></a>
+  <span style="font-size:13.5px;color:var(--text-muted);">Posting your profile as <strong id="user-name">Jane W.</strong></span>
+</div>
+
+<div class="page-container">
+  <div class="page-header">
+    <h1>Post Your Profile</h1>
+    <p>Complete all sections carefully. Your profile will be reviewed by our admin team before going live. <strong>ID details will never be shared publicly.</strong></p>
+  </div>
+
+  <div class="progress-steps">
+    <div class="progress-step done" id="step-tab-1">Personal</div>
+    <div class="progress-step active" id="step-tab-2">Identity</div>
+    <div class="progress-step" id="step-tab-3">Education</div>
+    <div class="progress-step" id="step-tab-4">Experience</div>
+    <div class="progress-step" id="step-tab-5">Location</div>
+    <div class="progress-step" id="step-tab-6">Referees</div>
+    <div class="progress-step" id="step-tab-7">About You</div>
+    <div class="progress-step" id="step-tab-8">Declaration</div>
+  </div>
+
+  <div id="form-step-1" class="step-content">
+    <!-- PERSONAL INFO -->
+    <div class="form-section">
+      <h3><span class="section-num">1</span> Personal Information</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Full Name <span class="required">*</span></label>
+          <input type="text" id="fullname" placeholder="As it appears on your ID">
+        </div>
+        <div class="form-group">
+          <label>Phone Number <span class="required">*</span> <span style="font-size:11px;color:var(--text-muted)">(must be active)</span></label>
+          <input type="tel" id="phone" placeholder="+254 7XX XXX XXX">
+        </div>
+        <div class="form-group">
+          <label>Email Address <span class="required">*</span></label>
+          <input type="email" id="email" placeholder="Pre-filled from account" value="jane@example.com">
+          <div class="hint">Auto-filled from your account</div>
+        </div>
+        <div class="form-group">
+          <label>Date of Birth <span class="required">*</span> <span style="font-size:11px;color:var(--text-muted)">(must be 19+)</span></label>
+          <input type="date" id="dob" onchange="checkAge()" max="">
+          <div class="age-warning" id="age-warning">⚠ You must be at least 19 years old to register on Amilia Care.</div>
+        </div>
+        <div class="form-group">
+          <label>Gender <span class="required">*</span></label>
+          <select>
+            <option value="">Select gender</option>
+            <option>Female</option>
+            <option>Male</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preferred Role <span class="required">*</span></label>
+          <select>
+            <option value="">Select your role</option>
+            <option>House Manager</option>
+            <option>Nanny / Childcare</option>
+            <option>Cook / Chef</option>
+            <option>Cleaner</option>
+            <option>Gardener</option>
+            <option>Driver</option>
+            <option>Security Guard</option>
+            <option>Elder Caregiver</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Expected Salary (KES/month) <span class="required">*</span></label>
+          <select>
+            <option value="">Select range</option>
+            <option>5,000 – 10,000</option>
+            <option>10,000 – 20,000</option>
+            <option>20,000 – 35,000</option>
+            <option>35,000 – 50,000</option>
+            <option>50,000+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Availability <span class="required">*</span></label>
+          <select>
+            <option>Live-in</option>
+            <option>Day Work</option>
+            <option>Part Time</option>
+            <option>Full Time</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Disability <span class="required">*</span></label>
+          <select id="disability">
+            <option value="">Select</option>
+            <option value="no">No</option>
+            <option value="yes">Yes – please describe in 'About You'</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:right;margin-top:1rem">
+      <button class="btn-primary" onclick="goStep(2)">Next: Identity Verification →</button>
+    </div>
+  </div>
+
+  <div id="form-step-2" class="step-content" style="display:none">
+    <!-- IDENTITY -->
+    <div class="form-section">
+      <h3><span class="section-num">2</span> Identity Verification</h3>
+      <div class="disclaimer-box">
+        <strong>🔒 Privacy Disclaimer</strong>
+        Your ID number and uploaded documents are strictly confidential and will <em>never</em> be shared with employers or the public. They are used solely for age and identity verification by the Amilia Care admin team.
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>National ID Number <span class="required">*</span></label>
+          <input type="text" placeholder="Enter your ID number" maxlength="8">
+          <div class="hint">Strictly confidential – not visible to employers</div>
+        </div>
+        <div class="form-group">
+          <label>ID Type <span class="required">*</span></label>
+          <select>
+            <option>National ID</option>
+            <option>Passport</option>
+            <option>Alien ID</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid" style="margin-top:1rem">
+        <div class="form-group">
+          <label>Upload ID (Front) <span class="required">*</span></label>
+          <div class="upload-zone" onclick="this.querySelector('input').click()">
+            <span>📄</span>
+            <p>Click to upload front of ID</p>
+            <p style="font-size:11px;margin-top:4px">JPG, PNG or PDF – max 5MB</p>
+            <input type="file" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="showFileName(this)">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Upload ID (Back) <span class="required">*</span></label>
+          <div class="upload-zone" onclick="this.querySelector('input').click()">
+            <span>📄</span>
+            <p>Click to upload back of ID</p>
+            <p style="font-size:11px;margin-top:4px">JPG, PNG or PDF – max 5MB</p>
+            <input type="file" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="showFileName(this)">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Upload Selfie <span class="required">*</span> <span style="font-size:11px;color:var(--text-muted)">(holding your ID)</span></label>
+          <div class="upload-zone" onclick="this.querySelector('input').click()">
+            <span>🤳</span>
+            <p>Clear selfie holding your ID</p>
+            <p style="font-size:11px;margin-top:4px">JPG or PNG – max 5MB</p>
+            <input type="file" accept=".jpg,.jpeg,.png" style="display:none" onchange="showFileName(this)">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn-outline" style="padding:9px 20px;border-radius:50px;cursor:pointer;font-size:14px" onclick="goStep(1)">← Back</button>
+      <button class="btn-primary" onclick="goStep(3)">Next: Education →</button>
+    </div>
+  </div>
+
+  <div id="form-step-3" class="step-content" style="display:none">
+    <!-- EDUCATION -->
+    <div class="form-section">
+      <h3><span class="section-num">3</span> Education</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Highest Education Level <span class="required">*</span></label>
+          <select>
+            <option value="">Select level</option>
+            <option>No formal education</option>
+            <option>Primary (KCPE)</option>
+            <option>Secondary (KCSE)</option>
+            <option>Certificate</option>
+            <option>Diploma</option>
+            <option>Bachelor's Degree</option>
+            <option>Master's Degree or above</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Year Completed <span class="required">*</span></label>
+          <input type="number" placeholder="e.g. 2018" min="1990" max="2025">
+        </div>
+        <div class="form-group">
+          <label>Name of Institution</label>
+          <input type="text" placeholder="School/College name">
+        </div>
+        <div class="form-group">
+          <label>Certificate/Field of Study</label>
+          <input type="text" placeholder="e.g. Home Management, Culinary Arts">
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:1rem">
+        <label>Upload Education Certificate (optional)</label>
+        <div class="upload-zone" onclick="this.querySelector('input').click()">
+          <span>📜</span>
+          <p>Click to upload your certificate</p>
+          <p style="font-size:11px;margin-top:4px">JPG, PNG or PDF – max 5MB</p>
+          <input type="file" style="display:none" onchange="showFileName(this)">
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn-outline" style="padding:9px 20px;border-radius:50px;cursor:pointer;font-size:14px" onclick="goStep(2)">← Back</button>
+      <button class="btn-primary" onclick="goStep(4)">Next: Experience →</button>
+    </div>
+  </div>
+
+  <div id="form-step-4" class="step-content" style="display:none">
+    <!-- EXPERIENCE -->
+    <div class="form-section">
+      <h3><span class="section-num">4</span> Work Experience</h3>
+      <div class="info-note">List your previous employment. You can add up to 5 entries. Employer contact details are optional.</div>
+      <div id="exp-list">
+        <div class="referee-block" id="exp-1">
+          <h4>Experience 1</h4>
+          <div class="exp-row">
+            <div>
+              <label>Role Held <span class="required">*</span></label>
+              <input type="text" placeholder="e.g. House Manager">
+            </div>
+            <div>
+              <label>Duration (years) <span class="required">*</span></label>
+              <input type="number" placeholder="e.g. 2" min="0" max="50">
+            </div>
+            <div>
+              <label>Employer Contact (optional)</label>
+              <input type="tel" placeholder="+254 7XX XXX XXX">
+            </div>
+          </div>
+          <div class="exp-row">
+            <div>
+              <label>Employer Name (optional)</label>
+              <input type="text" placeholder="Employer or company name">
+            </div>
+            <div>
+              <label>Location</label>
+              <input type="text" placeholder="e.g. Kilimani, Nairobi">
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="add-exp-btn" onclick="addExperience()">+ Add Another Experience</button>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn-outline" style="padding:9px 20px;border-radius:50px;cursor:pointer;font-size:14px" onclick="goStep(3)">← Back</button>
+      <button class="btn-primary" onclick="goStep(5)">Next: Location →</button>
+    </div>
+  </div>
+
+  <div id="form-step-5" class="step-content" style="display:none">
+    <!-- LOCATION -->
+    <div class="form-section">
+      <h3><span class="section-num">5</span> Location Details</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Current Town/Estate <span class="required">*</span></label>
+          <input type="text" placeholder="e.g. Kasarani, Nairobi">
+          <div class="hint">Where you currently live</div>
+        </div>
+        <div class="form-group">
+          <label>County <span class="required">*</span></label>
+          <select>
+            <option value="">Select County</option>
+            <option>Nairobi</option><option>Kiambu</option><option>Machakos</option>
+            <option>Kajiado</option><option>Nakuru</option><option>Mombasa</option>
+            <option>Kisumu</option><option>Eldoret (Uasin Gishu)</option>
+            <option>Nyeri</option><option>Muranga</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Home / Physical Address <span class="required">*</span></label>
+          <input type="text" placeholder="House number, road, estate">
+        </div>
+        <div class="form-group">
+          <label>Home Village <span class="required">*</span></label>
+          <input type="text" placeholder="Your upcountry village">
+        </div>
+        <div class="form-group">
+          <label>Home County</label>
+          <input type="text" placeholder="e.g. Nyeri, Murang'a">
+        </div>
+        <div class="form-group">
+          <label>Willing to Relocate?</label>
+          <select>
+            <option>Yes – anywhere in Kenya</option>
+            <option>Yes – within my county</option>
+            <option>No – prefer current location</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn-outline" style="padding:9px 20px;border-radius:50px;cursor:pointer;font-size:14px" onclick="goStep(4)">← Back</button>
+      <button class="btn-primary" onclick="goStep(6)">Next: Referees →</button>
+    </div>
+  </div>
+
+  <div id="form-step-6" class="step-content" style="display:none">
+    <!-- REFEREES -->
+    <div class="form-section">
+      <h3><span class="section-num">6</span> Referees <span style="font-size:12px;font-weight:400;color:var(--text-muted)">(3 required)</span></h3>
+      <div class="disclaimer-box">
+        <strong>📋 Referee Requirements</strong>
+        You must provide exactly <strong>3 adult referees</strong>. At least one must be a <strong>family member</strong>. All phone numbers must be <strong>active and working</strong>. Each referee must upload their National ID.
+      </div>
+      
+      <div id="referee-list">
+        <!-- Referee 1 -->
+        <div class="referee-block">
+          <h4>Referee 1 <span style="color:var(--green);font-size:11px">(Family member)</span></h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Full Name <span class="required">*</span></label>
+              <input type="text" placeholder="Referee's full name">
+            </div>
+            <div class="form-group">
+              <label>Relationship <span class="required">*</span></label>
+              <select>
+                <option>Parent</option><option>Sibling</option><option>Aunt/Uncle</option>
+                <option>Grandparent</option><option>Other family</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Active Phone Number <span class="required">*</span></label>
+              <input type="tel" placeholder="+254 7XX XXX XXX">
+            </div>
+            <div class="form-group">
+              <label>National ID Number <span class="required">*</span></label>
+              <input type="text" placeholder="Referee's ID number">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Upload Referee ID <span class="required">*</span></label>
+            <div class="upload-zone" onclick="this.querySelector('input').click()">
+              <span>📄</span><p>Click to upload referee's ID</p>
+              <input type="file" style="display:none" onchange="showFileName(this)">
+            </div>
+          </div>
+        </div>
+
+        <!-- Referee 2 -->
+        <div class="referee-block">
+          <h4>Referee 2</h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Full Name <span class="required">*</span></label>
+              <input type="text" placeholder="Referee's full name">
+            </div>
+            <div class="form-group">
+              <label>Relationship <span class="required">*</span></label>
+              <select>
+                <option>Parent</option><option>Sibling</option><option>Friend</option>
+                <option>Former Employer</option><option>Community Leader</option><option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Active Phone Number <span class="required">*</span></label>
+              <input type="tel" placeholder="+254 7XX XXX XXX">
+            </div>
+            <div class="form-group">
+              <label>National ID Number <span class="required">*</span></label>
+              <input type="text" placeholder="Referee's ID number">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Upload Referee ID <span class="required">*</span></label>
+            <div class="upload-zone" onclick="this.querySelector('input').click()">
+              <span>📄</span><p>Click to upload referee's ID</p>
+              <input type="file" style="display:none" onchange="showFileName(this)">
+            </div>
+          </div>
+        </div>
+
+        <!-- Referee 3 -->
+        <div class="referee-block">
+          <h4>Referee 3</h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Full Name <span class="required">*</span></label>
+              <input type="text" placeholder="Referee's full name">
+            </div>
+            <div class="form-group">
+              <label>Relationship <span class="required">*</span></label>
+              <select>
+                <option>Parent</option><option>Sibling</option><option>Friend</option>
+                <option>Former Employer</option><option>Community Leader</option><option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Active Phone Number <span class="required">*</span></label>
+              <input type="tel" placeholder="+254 7XX XXX XXX">
+            </div>
+            <div class="form-group">
+              <label>National ID Number <span class="required">*</span></label>
+              <input type="text" placeholder="Referee's ID number">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Upload Referee ID <span class="required">*</span></label>
+            <div class="upload-zone" onclick="this.querySelector('input').click()">
+              <span>📄</span><p>Click to upload referee's ID</p>
+              <input type="file" style="display:none" onchange="showFileName(this)">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn-outline" style="padding:9px 20px;border-radius:50px;cursor:pointer;font-size:14px" onclick="goStep(5)">← Back</button>
+      <button class="btn-primary" onclick="goStep(7)">Next: About You →</button>
+    </div>
+  </div>
+
+  <div id="form-step-7" class="step-content" style="display:none">
+    <!-- ABOUT -->
+    <div class="form-section">
+      <h3><span class="section-num">7</span> About Yourself</h3>
+      <div class="form-group">
+        <label>Describe Yourself <span class="required">*</span> <span style="font-size:11px;color:var(--text-muted)">(min 200 characters)</span></label>
+        <textarea id="about-text" rows="7" placeholder="Tell employers about yourself — your personality, work ethic, skills, what you enjoy doing, and why you'd be a great hire. Be specific and genuine. (Minimum 200 characters)" oninput="countChars()"></textarea>
+        <div class="char-count" id="char-count">0 / 200 minimum</div>
+      </div>
+      <div class="form-grid" style="margin-top:1rem">
+        <div class="form-group">
+          <label>Languages Spoken</label>
+          <input type="text" placeholder="e.g. English, Swahili, Kikuyu">
+        </div>
+        <div class="form-group">
+          <label>Key Skills</label>
+          <input type="text" placeholder="e.g. Cooking, Childcare, Driving">
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:1rem">
+        <label>Upload Profile Photo (optional)</label>
+        <div class="upload-zone" onclick="this.querySelector('input').click()">
+          <span>📸</span>
+          <p>A clear, professional-looking photo</p>
+          <p style="font-size:11px;margin-top:4px">JPG or PNG – max 3MB. Will be shown on your public profile.</p>
+          <input type="file" accept=".jpg,.jpeg,.png" style="display:none" onchange="showFileName(this)">
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn-outline" style="padding:9px 20px;border-radius:50px;cursor:pointer;font-size:14px" onclick="goStep(6)">← Back</button>
+      <button class="btn-primary" onclick="goStep(8)">Next: Declaration →</button>
+    </div>
+  </div>
+
+  <div id="form-step-8" class="step-content" style="display:none">
+    <!-- DECLARATION -->
+    <div class="form-section">
+      <h3><span class="section-num">8</span> Declaration & Submission</h3>
+      <div class="disclaimer-box" style="margin-bottom:1.5rem">
+        <strong>⚠ Please read carefully before submitting</strong>
+        Your profile will be reviewed by the Amilia Care admin team. Once approved, it will be visible to employers. Submitting false information may lead to permanent suspension.
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:1.5rem">
+        <div class="checkbox-group">
+          <input type="checkbox" id="decl-adult">
+          <label for="decl-adult"><strong>I declare that I am an adult aged 19 years or above.</strong> I understand that underage applicants will be rejected and reported.</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="decl-correct">
+          <label for="decl-correct"><strong>I declare that all information I have provided is true, accurate and correct</strong> to the best of my knowledge. I understand that any false information may result in my account being removed.</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="decl-privacy">
+          <label for="decl-privacy">I have read and understood Amilia Care's <a href="#" style="color:var(--green)">Privacy Policy</a>. I consent to my information being stored securely and used to match me with employers.</label>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="decl-refs">
+          <label for="decl-refs">I confirm that all referees I have listed are real adults who have agreed to be listed as my referees and whose phone numbers are working.</label>
+        </div>
+      </div>
+
+      <div id="submit-error" style="display:none;background:#FCEBEB;border:1px solid #F09595;border-radius:8px;padding:10px 14px;font-size:13px;color:#A32D2D;margin-bottom:1rem;"></div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:1rem">
+      <button class="btn-outline" style="padding:9px 20px;border-radius:50px;cursor:pointer;font-size:14px" onclick="goStep(7)">← Back</button>
+      <button class="btn-primary" style="padding:12px 32px;font-size:15px" onclick="submitProfile()">Submit Profile for Review ✓</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="form-success" style="display:none;text-align:center;padding:4rem 2rem;background:#fff;border:1px solid var(--border);border-radius:12px">
+    <div style="font-size:4rem;margin-bottom:1rem">🎉</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:.8rem">Profile Submitted!</h2>
+    <p style="color:var(--text-muted);max-width:420px;margin:0 auto 2rem;font-size:15px">Your profile has been submitted for review by our admin team. You will receive an SMS and email within 1–3 business days.</p>
+    <a href="employee-dashboard.html" class="btn-primary" style="padding:12px 32px;font-size:15px">Go to My Dashboard →</a>
+  </div>
+
+</div>
+
+<script>
+let expCount = 1;
+
+function goStep(step) {
+  document.querySelectorAll('.step-content').forEach(s => s.style.display = 'none');
+  const el = document.getElementById('form-step-' + step);
+  if (el) el.style.display = 'block';
+  document.querySelectorAll('.progress-step').forEach((t, i) => {
+    t.classList.remove('active', 'done');
+    if (i + 1 < step) t.classList.add('done');
+    else if (i + 1 === step) t.classList.add('active');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function checkAge() {
+  const dob = new Date(document.getElementById('dob').value);
+  const today = new Date();
+  const age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
+  const warn = document.getElementById('age-warning');
+  if (age < 19) { warn.style.display = 'block'; }
+  else { warn.style.display = 'none'; }
+}
+
+function countChars() {
+  const text = document.getElementById('about-text').value;
+  const len = text.length;
+  const el = document.getElementById('char-count');
+  el.textContent = len + ' / 200 minimum';
+  el.className = 'char-count' + (len < 200 ? ' error' : '');
+}
+
+function showFileName(input) {
+  if (input.files && input.files[0]) {
+    const zone = input.closest('.upload-zone');
+    zone.querySelector('p').textContent = '✔ ' + input.files[0].name;
+    zone.style.borderColor = 'var(--green)';
+    zone.style.background = 'var(--green-light)';
+  }
+}
+
+function addExperience() {
+  if (expCount >= 5) return;
+  expCount++;
+  const div = document.createElement('div');
+  div.className = 'referee-block';
+  div.innerHTML = `<h4>Experience ${expCount} <button class="remove-exp" onclick="this.closest('.referee-block').remove()">×</button></h4>
+  <div class="exp-row">
+    <div><label>Role Held *</label><input type="text" placeholder="e.g. Cook"></div>
+    <div><label>Duration (years) *</label><input type="number" placeholder="e.g. 1" min="0" max="50"></div>
+    <div><label>Employer Contact (optional)</label><input type="tel" placeholder="+254 7XX XXX XXX"></div>
+  </div>`;
+  document.getElementById('exp-list').appendChild(div);
+}
+
+function submitProfile() {
+  const checks = ['decl-adult','decl-correct','decl-privacy','decl-refs'];
+  const allChecked = checks.every(id => document.getElementById(id).checked);
+  const err = document.getElementById('submit-error');
+  if (!allChecked) {
+    err.style.display = 'block'; err.textContent = 'Please check all declaration boxes before submitting.';
+    return;
+  }
+  err.style.display = 'none';
+  document.getElementById('form-step-8').style.display = 'none';
+  document.querySelector('.progress-steps').style.display = 'none';
+  document.getElementById('form-success').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Init on step 1
+goStep(1);
+</script>
+</body>
+</html>

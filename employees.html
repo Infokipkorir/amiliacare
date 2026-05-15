@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browse Workers – Amilia Care</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <span>📍 Nairobi, Kenya</span>
+  <span>📞 +254 700 000 000 &nbsp;|&nbsp; info@amiliacare.co.ke</span>
+</div>
+<nav class="navbar">
+  <a href="index.html" class="logo">Amilia<span>Care</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="employees.html" class="active">Find Workers</a></li>
+    <li><a href="#testimonials">Testimonials</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="login.html" class="btn-outline">Login</a>
+    <a href="register.html" class="btn-primary">Get Started</a>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">&#9776;</button>
+</nav>
+
+<div class="page-banner">
+  <h1>Browse Verified Workers</h1>
+  <p>All profiles are admin-verified with ID, selfie & references. Age 19+ only.</p>
+</div>
+
+<div class="listing-layout">
+  <!-- SIDEBAR FILTERS -->
+  <aside class="sidebar-filters">
+    <h3>🔍 Filters</h3>
+
+    <div class="filter-section">
+      <h4>Location</h4>
+      <input type="text" placeholder="Town / Estate">
+    </div>
+    <div class="filter-section">
+      <h4>Role</h4>
+      <select onchange="filterWorkers()">
+        <option>All Roles</option>
+        <option>House Manager</option>
+        <option>Nanny / Childcare</option>
+        <option>Cook / Chef</option>
+        <option>Cleaner</option>
+        <option>Gardener</option>
+        <option>Driver</option>
+        <option>Security Guard</option>
+        <option>Elder Caregiver</option>
+      </select>
+    </div>
+    <div class="filter-section">
+      <h4>Salary Range (KES/mo)</h4>
+      <select onchange="filterWorkers()">
+        <option>Any Range</option>
+        <option>5,000 – 10,000</option>
+        <option>10,000 – 20,000</option>
+        <option>20,000 – 35,000</option>
+        <option>35,000 – 50,000</option>
+        <option>50,000+</option>
+      </select>
+    </div>
+    <div class="filter-section">
+      <h4>Age Range</h4>
+      <select onchange="filterWorkers()">
+        <option>Age 19+ (All)</option>
+        <option>19 – 25</option>
+        <option>26 – 35</option>
+        <option>36 – 45</option>
+        <option>46+</option>
+      </select>
+    </div>
+    <div class="filter-section">
+      <h4>Education Level</h4>
+      <select onchange="filterWorkers()">
+        <option>Any Level</option>
+        <option>Primary</option>
+        <option>Secondary (KCSE)</option>
+        <option>Certificate</option>
+        <option>Diploma</option>
+        <option>Degree+</option>
+      </select>
+    </div>
+    <div class="filter-section">
+      <h4>Experience</h4>
+      <select onchange="filterWorkers()">
+        <option>Any Experience</option>
+        <option>0 – 1 year</option>
+        <option>1 – 3 years</option>
+        <option>3 – 5 years</option>
+        <option>5+ years</option>
+      </select>
+    </div>
+    <div class="filter-section">
+      <h4>Availability</h4>
+      <select onchange="filterWorkers()">
+        <option>Any</option>
+        <option>Live-in</option>
+        <option>Day Work</option>
+        <option>Part Time</option>
+        <option>Full Time</option>
+      </select>
+    </div>
+    <button onclick="clearFilters()" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text-muted);">Clear Filters</button>
+  </aside>
+
+  <!-- LISTING -->
+  <div>
+    <div class="listing-header">
+      <h2>Showing <span id="count">12</span> workers</h2>
+      <select style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+        <option>Sort: Newest First</option>
+        <option>Sort: Most Experienced</option>
+        <option>Sort: Salary (Low-High)</option>
+        <option>Sort: Salary (High-Low)</option>
+      </select>
+    </div>
+    <div class="listing-grid" id="workers-grid">
+      <!-- cards populated by JS -->
+    </div>
+  </div>
+</div>
+
+<footer class="footer" style="margin-top:3rem">
+  <div class="footer-bottom" style="padding:1.5rem;border-top:1px solid rgba(255,255,255,.1)">© 2025 Amilia Care. All Rights Reserved.</div>
+</footer>
+
+<script>
+const workers = [
+  { init:'GN', name:'Grace N.', role:'House Manager', loc:'Westlands, Nairobi', exp:'6 years', edu:'Diploma', salary:'KES 20,000–30,000', avail:'Live-in', bg:'#C9E8D4', verified:true },
+  { init:'AM', name:'Agnes M.', role:'Nanny / Childcare', loc:'Karen, Nairobi', exp:'4 years', edu:'KCSE', salary:'KES 15,000–22,000', avail:'Day Work', bg:'#D6CBEE', verified:true },
+  { init:'JK', name:'James K.', role:'Cook / Chef', loc:'Kilimani, Nairobi', exp:'8 years', edu:'Diploma', salary:'KES 25,000–40,000', avail:'Full Time', bg:'#FAD4BB', verified:true },
+  { init:'FM', name:'Faith M.', role:'Cleaner', loc:'Embakasi, Nairobi', exp:'2 years', edu:'KCSE', salary:'KES 10,000–15,000', avail:'Part Time', bg:'#B5D4F4', verified:true },
+  { init:'PO', name:'Peter O.', role:'Gardener', loc:'Ruaka, Kiambu', exp:'5 years', edu:'Primary', salary:'KES 12,000–18,000', avail:'Day Work', bg:'#C0DD97', verified:true },
+  { init:'LW', name:'Lucy W.', role:'Elder Caregiver', loc:'Lavington, Nairobi', exp:'3 years', edu:'Certificate', salary:'KES 18,000–25,000', avail:'Live-in', bg:'#F4C0D1', verified:true },
+  { init:'SM', name:'Samuel M.', role:'Driver', loc:'Thika Road, Nairobi', exp:'7 years', edu:'KCSE', salary:'KES 20,000–30,000', avail:'Full Time', bg:'#FAC775', verified:true },
+  { init:'RK', name:'Rose K.', role:'House Manager', loc:'Runda, Nairobi', exp:'10 years', edu:'Degree', salary:'KES 35,000–50,000', avail:'Live-in', bg:'#9FE1CB', verified:true },
+  { init:'DN', name:'Dennis N.', role:'Security Guard', loc:'Kiambu Town', exp:'4 years', edu:'KCSE', salary:'KES 15,000–20,000', avail:'Full Time', bg:'#B4B2A9', verified:true },
+  { init:'CW', name:'Christine W.', role:'Nanny / Childcare', loc:'Ngong, Kajiado', exp:'2 years', edu:'KCSE', salary:'KES 12,000–18,000', avail:'Live-in', bg:'#EEEDFE', verified:true },
+  { init:'MO', name:'Mary O.', role:'Cook / Chef', loc:'South C, Nairobi', exp:'6 years', edu:'Diploma', salary:'KES 20,000–28,000', avail:'Day Work', bg:'#D4537E33', verified:true },
+  { init:'BK', name:'Bernard K.', role:'Driver', loc:'Upperhill, Nairobi', exp:'9 years', edu:'KCSE', salary:'KES 25,000–35,000', avail:'Full Time', bg:'#E1F5EE', verified:true },
+];
+
+function renderWorkers(list) {
+  const grid = document.getElementById('workers-grid');
+  document.getElementById('count').textContent = list.length;
+  grid.innerHTML = list.map(w => `
+    <div class="profile-card">
+      <div class="card-top">
+        <div class="avatar" style="background:${w.bg}">${w.init}</div>
+        <div class="card-info">
+          <h4>${w.name}</h4>
+          <p>${w.role}</p>
+          ${w.verified ? '<span class="badge verified">✔ Verified</span>' : ''}
+        </div>
+      </div>
+      <div class="card-details">
+        <div class="detail">📍 ${w.loc}</div>
+        <div class="detail">💼 ${w.exp} experience</div>
+        <div class="detail">🎓 ${w.edu}</div>
+        <div class="detail">💰 ${w.salary}/mo</div>
+        <div class="detail">🏠 ${w.avail}</div>
+      </div>
+      <a href="login.html" class="btn-card">View Full Profile</a>
+    </div>
+  `).join('');
+}
+
+function filterWorkers() { renderWorkers(workers); }
+function clearFilters() { document.querySelectorAll('.filter-section select, .filter-section input').forEach(el => { if (el.tagName === 'SELECT') el.selectedIndex = 0; else el.value = ''; }); renderWorkers(workers); }
+function toggleMenu() { document.querySelector('.nav-links').classList.toggle('open'); }
+
+renderWorkers(workers);
+</script>
+</body>
+</html>

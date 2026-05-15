@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employer Dashboard – Amilia Care</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="emp-layout">
+  <aside class="emp-sidebar">
+    <div class="logo" style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border)">Amilia<span>Care</span></div>
+    <nav class="emp-nav">
+      <a href="#" class="active">🏠 Dashboard</a>
+      <a href="employees.html">🔍 Find Workers</a>
+      <a href="#">❤️ Saved Workers</a>
+      <a href="#">💬 Messages</a>
+      <a href="#">📋 My Hires</a>
+      <a href="#">⚙️ Settings</a>
+      <a href="index.html">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <div class="emp-main">
+    <div class="emp-topbar">
+      <h2>Welcome, Sarah Mwangi 👋</h2>
+      <div style="display:flex;align-items:center;gap:12px">
+        <a href="employees.html" class="btn-primary" style="padding:8px 18px;font-size:13px">🔍 Find Workers</a>
+        <div class="avatar" style="background:#FAEEDA;width:36px;height:36px;font-size:13px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700">SM</div>
+      </div>
+    </div>
+
+    <div class="emp-content">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem">
+        <div class="admin-card">
+          <div class="ac-icon" style="background:var(--green-light);font-size:20px">🔍</div>
+          <strong>84</strong><span>Searches Made</span>
+        </div>
+        <div class="admin-card">
+          <div class="ac-icon" style="background:#E6F1FB;font-size:20px">❤️</div>
+          <strong>12</strong><span>Saved Profiles</span>
+        </div>
+        <div class="admin-card">
+          <div class="ac-icon" style="background:#FAEEDA;font-size:20px">💬</div>
+          <strong>5</strong><span>Workers Contacted</span>
+        </div>
+        <div class="admin-card">
+          <div class="ac-icon" style="background:var(--green-light);font-size:20px">✅</div>
+          <strong>2</strong><span>Active Hires</span>
+        </div>
+      </div>
+
+      <!-- QUICK SEARCH -->
+      <div class="data-table" style="margin-bottom:1.5rem">
+        <div class="table-header"><h3>Quick Worker Search</h3><a href="employees.html" class="btn-outline" style="padding:7px 14px;border-radius:50px;font-size:12.5px">Full Search →</a></div>
+        <div style="padding:1.2rem;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end">
+          <div><label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Role</label>
+          <select style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none">
+            <option>House Manager</option><option>Nanny</option><option>Cook/Chef</option><option>Cleaner</option>
+          </select></div>
+          <div><label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Location</label>
+          <input type="text" placeholder="e.g. Westlands" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none"></div>
+          <div><label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Salary Range</label>
+          <select style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none">
+            <option>Any Range</option><option>10k–20k</option><option>20k–35k</option><option>35k+</option>
+          </select></div>
+          <a href="employees.html" class="btn-primary" style="padding:10px 22px;font-size:14px">Search</a>
+        </div>
+      </div>
+
+      <!-- SAVED WORKERS -->
+      <div class="data-table">
+        <div class="table-header"><h3>Saved Workers</h3><a href="employees.html" class="btn-outline" style="padding:7px 14px;border-radius:50px;font-size:12.5px">Browse All →</a></div>
+        <table>
+          <thead><tr><th>Worker</th><th>Role</th><th>Location</th><th>Salary</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:#C9E8D4;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">GN</div><strong>Grace N.</strong></div></td>
+              <td>House Manager</td><td>Westlands</td><td>KES 20k–30k</td>
+              <td><span class="badge verified">✔ Verified</span></td>
+              <td><div style="display:flex;gap:6px"><button class="action-btn approve">Contact</button><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:#D6CBEE;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">AM</div><strong>Agnes M.</strong></div></td>
+              <td>Nanny</td><td>Karen</td><td>KES 15k–22k</td>
+              <td><span class="badge verified">✔ Verified</span></td>
+              <td><div style="display:flex;gap:6px"><button class="action-btn approve">Contact</button><button class="action-btn">View</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
