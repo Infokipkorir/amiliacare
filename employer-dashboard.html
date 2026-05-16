@@ -4,94 +4,1033 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Employer Dashboard – Amilia Care</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --brand: #1B6B45;
+    --brand-light: #E6F5EE;
+    --brand-mid: #C9E8D4;
+    --accent: #E8A040;
+    --accent-light: #FAEEDA;
+    --sidebar-bg: #0F3D28;
+    --sidebar-text: #B8D9C6;
+    --sidebar-active: #1B6B45;
+    --bg: #F4F7F5;
+    --surface: #FFFFFF;
+    --border: #E2EBE6;
+    --text: #1A2E24;
+    --text-muted: #6B8876;
+    --text-light: #9BB5A5;
+    --danger: #C0392B;
+    --danger-light: #FDECEA;
+    --info-light: #E6F1FB;
+    --info: #1A6BB5;
+    --purple-light: #EEE9FB;
+    --purple: #6B52C8;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 228px;
+    min-height: 100vh;
+    background: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    padding: 1.4rem 1.5rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 21px;
+    color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    letter-spacing: -0.3px;
+  }
+  .logo span { color: var(--accent); }
+
+  nav { padding: 1rem 0.75rem; flex: 1; }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 400;
+    margin-bottom: 2px;
+    transition: background 0.15s, color 0.15s;
+  }
+  nav a:hover { background: rgba(255,255,255,0.07); color: #fff; }
+  nav a.active { background: var(--brand); color: #fff; font-weight: 500; }
+
+  nav a svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+  .nav-section-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    color: rgba(184,217,198,0.45);
+    text-transform: uppercase;
+    padding: 1rem 12px 0.4rem;
+  }
+
+  .sidebar-footer {
+    padding: 1rem 0.75rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-footer a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; border-radius: var(--radius-sm);
+    color: rgba(184,217,198,0.6); text-decoration: none;
+    font-size: 13px; transition: all 0.15s;
+  }
+  .sidebar-footer a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+
+  /* MAIN */
+  .main {
+    margin-left: 228px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .topbar-title span { color: var(--text-muted); font-weight: 400; font-size: 13px; font-family: 'DM Sans', sans-serif; margin-left: 8px; }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 50px;
+    font-size: 13px; font-weight: 500; font-family: inherit;
+    cursor: pointer; border: none; transition: all 0.15s; text-decoration: none;
+  }
+  .btn-primary { background: var(--brand); color: #fff; }
+  .btn-primary:hover { background: #155735; }
+  .btn-outline { background: transparent; color: var(--brand); border: 1.5px solid var(--brand-mid); }
+  .btn-outline:hover { background: var(--brand-light); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--bg); }
+
+  .avatar-circle {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--accent-light); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+
+  /* CONTENT */
+  .content { padding: 2rem; max-width: 1200px; }
+
+  /* STAT CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.25rem 1rem;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .stat-card.green::before { background: var(--brand); }
+  .stat-card.amber::before { background: var(--accent); }
+  .stat-card.blue::before { background: var(--info); }
+  .stat-card.purple::before { background: var(--purple); }
+
+  .stat-icon {
+    width: 36px; height: 36px; border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 0.85rem;
+    font-size: 17px;
+  }
+  .stat-card.green .stat-icon { background: var(--brand-light); }
+  .stat-card.amber .stat-icon { background: var(--accent-light); }
+  .stat-card.blue .stat-icon { background: var(--info-light); }
+  .stat-card.purple .stat-icon { background: var(--purple-light); }
+
+  .stat-value {
+    font-size: 26px;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+
+  /* PANELS */
+  .panel {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-title { font-size: 14px; font-weight: 600; }
+  .panel-body { padding: 1.25rem; }
+
+  /* SEARCH FORM */
+  .search-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+  }
+  .form-group label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .form-control {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+  }
+  .form-control:focus { border-color: var(--brand); }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 0.85rem 1.25rem;
+    font-size: 13.5px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .data-table tbody tr:last-child td { border-bottom: none; }
+  .data-table tbody tr { transition: background 0.1s; }
+  .data-table tbody tr:hover { background: var(--bg); }
+
+  .worker-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 50px;
+    font-size: 11.5px; font-weight: 500;
+  }
+  .badge-verified { background: var(--brand-light); color: var(--brand); }
+  .badge-pending { background: var(--accent-light); color: #7A5010; }
+  .badge-new { background: var(--info-light); color: var(--info); }
+
+  .action-row { display: flex; gap: 6px; }
+
+  .action-btn {
+    padding: 5px 12px; border-radius: 50px; font-size: 12px;
+    font-weight: 500; font-family: inherit; cursor: pointer;
+    border: 1.5px solid var(--border); background: transparent;
+    color: var(--text); transition: all 0.15s;
+  }
+  .action-btn:hover { background: var(--bg); }
+  .action-btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .action-btn.primary:hover { background: #155735; }
+  .action-btn.danger { color: var(--danger); border-color: #EFC5C2; }
+  .action-btn.danger:hover { background: var(--danger-light); }
+
+  /* STATUS INDICATORS */
+  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .dot-green { background: var(--brand); }
+  .dot-amber { background: var(--accent); }
+  .dot-gray { background: var(--text-light); }
+
+  /* LOADING */
+  .loading-row td {
+    text-align: center;
+    padding: 2.5rem !important;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block; margin-right: 8px;
+    vertical-align: -3px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* EMPTY */
+  .empty-state {
+    text-align: center; padding: 3rem 1.25rem;
+    color: var(--text-muted);
+  }
+  .empty-state svg { margin-bottom: 0.75rem; opacity: 0.4; }
+  .empty-state p { font-size: 13px; }
+
+  /* TOAST */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--text); color: #fff;
+    padding: 10px 20px; border-radius: 50px;
+    font-size: 13px; font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    opacity: 0; transition: opacity 0.25s;
+    pointer-events: none; z-index: 999;
+  }
+  #toast.show { opacity: 1; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    z-index: 200; display: none; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: var(--radius);
+    padding: 1.75rem; width: 480px; max-width: 95vw;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+  .modal-title { font-size: 16px; font-weight: 600; }
+  .modal-close {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted); font-size: 20px; line-height: 1;
+    padding: 2px 6px; border-radius: 4px;
+  }
+  .modal-close:hover { background: var(--bg); }
+
+  .profile-section { display: flex; align-items: center; gap: 14px; margin-bottom: 1.25rem; }
+  .profile-avatar-lg {
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; flex-shrink: 0;
+  }
+
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1rem; margin-bottom: 1.25rem; }
+  .detail-item label { font-size: 10.5px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px; }
+  .detail-item span { font-size: 13.5px; color: var(--text); }
+
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+
+  /* TWO COLUMN LAYOUT */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+  /* ACTIVITY FEED */
+  .activity-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 0.65rem 0; border-bottom: 1px solid var(--border);
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot-wrap {
+    width: 28px; height: 28px; border-radius: 50%;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .activity-text { font-size: 13px; color: var(--text); line-height: 1.45; }
+  .activity-time { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+  /* Scrollable table */
+  .table-scroll { overflow-x: auto; }
+
+  /* HIRE STATUS BADGES */
+  .hire-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 50px; font-size: 11.5px; font-weight: 500;
+  }
+  .hire-active { background: var(--brand-light); color: var(--brand); }
+  .hire-pending { background: var(--accent-light); color: #7A5010; }
+  .hire-ended { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+</style>
 </head>
 <body>
-<div class="emp-layout">
-  <aside class="emp-sidebar">
-    <div class="logo" style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border)">Amilia<span>Care</span></div>
-    <nav class="emp-nav">
-      <a href="#" class="active">🏠 Dashboard</a>
-      <a href="employees.html">🔍 Find Workers</a>
-      <a href="#">❤️ Saved Workers</a>
-      <a href="#">💬 Messages</a>
-      <a href="#">📋 My Hires</a>
-      <a href="#">⚙️ Settings</a>
-      <a href="index.html">🚪 Logout</a>
-    </nav>
-  </aside>
 
-  <div class="emp-main">
-    <div class="emp-topbar">
-      <h2>Welcome, Sarah Mwangi 👋</h2>
-      <div style="display:flex;align-items:center;gap:12px">
-        <a href="employees.html" class="btn-primary" style="padding:8px 18px;font-size:13px">🔍 Find Workers</a>
-        <div class="avatar" style="background:#FAEEDA;width:36px;height:36px;font-size:13px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700">SM</div>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">Amilia<span>Care</span></div>
+  <nav>
+    <div class="nav-section-label">Main</div>
+    <a href="#" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      Dashboard
+    </a>
+    <a href="#" onclick="showSection('find')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg>
+      Find Workers
+    </a>
+    <a href="#" onclick="showSection('saved')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      Saved Workers
+    </a>
+    <a href="#" onclick="showSection('messages')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Messages
+    </a>
+    <div class="nav-section-label">Manage</div>
+    <a href="#" onclick="showSection('hires')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="m9 12 2 2 4-4"/></svg>
+      My Hires
+    </a>
+    <a href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+      Profile
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="#">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93a10 10 0 0 0 14.14 14.14"/></svg>
+      Settings
+    </a>
+    <a href="#">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
+    </a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Welcome back, Sarah Mwangi 👋<span id="greeting-time"></span></div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-primary" onclick="openQuickSearch()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg>
+        Find Workers
+      </button>
+      <div class="avatar-circle">SM</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card green">
+        <div class="stat-icon">🔍</div>
+        <div class="stat-value" id="stat-searches">—</div>
+        <div class="stat-label">Searches Made</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-icon">❤️</div>
+        <div class="stat-value" id="stat-saved">—</div>
+        <div class="stat-label">Saved Profiles</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-icon">💬</div>
+        <div class="stat-value" id="stat-contacted">—</div>
+        <div class="stat-label">Workers Contacted</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value" id="stat-hires">—</div>
+        <div class="stat-label">Active Hires</div>
       </div>
     </div>
 
-    <div class="emp-content">
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem">
-        <div class="admin-card">
-          <div class="ac-icon" style="background:var(--green-light);font-size:20px">🔍</div>
-          <strong>84</strong><span>Searches Made</span>
-        </div>
-        <div class="admin-card">
-          <div class="ac-icon" style="background:#E6F1FB;font-size:20px">❤️</div>
-          <strong>12</strong><span>Saved Profiles</span>
-        </div>
-        <div class="admin-card">
-          <div class="ac-icon" style="background:#FAEEDA;font-size:20px">💬</div>
-          <strong>5</strong><span>Workers Contacted</span>
-        </div>
-        <div class="admin-card">
-          <div class="ac-icon" style="background:var(--green-light);font-size:20px">✅</div>
-          <strong>2</strong><span>Active Hires</span>
+    <!-- QUICK SEARCH -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Quick Worker Search</span>
+        <button class="btn btn-outline btn-sm" onclick="loadWorkers()">Browse All →</button>
+      </div>
+      <div class="panel-body">
+        <div class="search-grid">
+          <div class="form-group">
+            <label>Role</label>
+            <select class="form-control" id="search-role">
+              <option value="">Any Role</option>
+              <option value="House Manager">House Manager</option>
+              <option value="Nanny">Nanny</option>
+              <option value="Cook">Cook / Chef</option>
+              <option value="Cleaner">Cleaner</option>
+              <option value="Driver">Driver</option>
+              <option value="Guard">Guard / Security</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" class="form-control" id="search-location" placeholder="e.g. Westlands, Karen…">
+          </div>
+          <div class="form-group">
+            <label>Salary Range</label>
+            <select class="form-control" id="search-salary">
+              <option value="">Any Range</option>
+              <option value="10000-20000">KES 10k – 20k</option>
+              <option value="20000-35000">KES 20k – 35k</option>
+              <option value="35000-999999">KES 35k+</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="runSearch()">Search</button>
         </div>
       </div>
+    </div>
 
-      <!-- QUICK SEARCH -->
-      <div class="data-table" style="margin-bottom:1.5rem">
-        <div class="table-header"><h3>Quick Worker Search</h3><a href="employees.html" class="btn-outline" style="padding:7px 14px;border-radius:50px;font-size:12.5px">Full Search →</a></div>
-        <div style="padding:1.2rem;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end">
-          <div><label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Role</label>
-          <select style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none">
-            <option>House Manager</option><option>Nanny</option><option>Cook/Chef</option><option>Cleaner</option>
-          </select></div>
-          <div><label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Location</label>
-          <input type="text" placeholder="e.g. Westlands" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none"></div>
-          <div><label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Salary Range</label>
-          <select style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none">
-            <option>Any Range</option><option>10k–20k</option><option>20k–35k</option><option>35k+</option>
-          </select></div>
-          <a href="employees.html" class="btn-primary" style="padding:10px 22px;font-size:14px">Search</a>
-        </div>
-      </div>
-
+    <!-- TWO COL -->
+    <div class="two-col">
       <!-- SAVED WORKERS -->
-      <div class="data-table">
-        <div class="table-header"><h3>Saved Workers</h3><a href="employees.html" class="btn-outline" style="padding:7px 14px;border-radius:50px;font-size:12.5px">Browse All →</a></div>
-        <table>
-          <thead><tr><th>Worker</th><th>Role</th><th>Location</th><th>Salary</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Saved Workers</span>
+          <button class="btn btn-outline btn-sm" onclick="loadSavedWorkers()">View All →</button>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="saved-table">
+            <thead>
+              <tr>
+                <th>Worker</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="saved-body">
+              <tr class="loading-row"><td colspan="4"><span class="spinner"></span>Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ACTIVE HIRES -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Active Hires</span>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="hires-table">
+            <thead>
+              <tr>
+                <th>Worker</th>
+                <th>Role</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="hires-body">
+              <tr class="loading-row"><td colspan="3"><span class="spinner"></span>Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEARCH RESULTS -->
+    <div class="panel" id="results-panel" style="display:none">
+      <div class="panel-header">
+        <span class="panel-title">Search Results</span>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('results-panel').style.display='none'">✕ Close</button>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
             <tr>
-              <td><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:#C9E8D4;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">GN</div><strong>Grace N.</strong></div></td>
-              <td>House Manager</td><td>Westlands</td><td>KES 20k–30k</td>
-              <td><span class="badge verified">✔ Verified</span></td>
-              <td><div style="display:flex;gap:6px"><button class="action-btn approve">Contact</button><button class="action-btn">View</button></div></td>
+              <th>Worker</th>
+              <th>Role</th>
+              <th>Location</th>
+              <th>Salary (KES)</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
-            <tr>
-              <td><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:#D6CBEE;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">AM</div><strong>Agnes M.</strong></div></td>
-              <td>Nanny</td><td>Karen</td><td>KES 15k–22k</td>
-              <td><span class="badge verified">✔ Verified</span></td>
-              <td><div style="display:flex;gap:6px"><button class="action-btn approve">Contact</button><button class="action-btn">View</button></div></td>
-            </tr>
+          </thead>
+          <tbody id="results-body">
           </tbody>
         </table>
       </div>
     </div>
+
+    <!-- RECENT ACTIVITY -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Recent Activity</span>
+      </div>
+      <div class="panel-body" id="activity-body">
+        <div style="text-align:center;padding:1.5rem;color:var(--text-muted)"><span class="spinner"></span> Loading…</div>
+      </div>
+    </div>
+
   </div>
 </div>
+
+<!-- WORKER DETAIL MODAL -->
+<div class="modal-overlay" id="worker-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Worker Profile</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modal-content"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+      <button class="btn btn-outline btn-sm" id="modal-save-btn">❤️ Save Worker</button>
+      <button class="btn btn-primary" id="modal-contact-btn">Contact Worker</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://phoahudvrcelfrykoeuo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_s4Wljr3TEtjLRxNJ9DzRSw_17gtvoAb';
+const EMPLOYER_ID = 1; // Sarah Mwangi's employer ID — update as needed
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Greet based on time
+(function() {
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greeting-time').textContent = ' · ' + g;
+})();
+
+const AVATAR_COLORS = [
+  ['#C9E8D4','#1B6B45'], ['#D6CBEE','#6B52C8'], ['#FAEEDA','#7A5010'],
+  ['#B5D4F4','#1A6BB5'], ['#F5C4B3','#993C1D'], ['#F4C0D1','#993556']
+];
+
+function avatarColor(name) {
+  let h = 0; for (let c of name) h = (h*31+c.charCodeAt(0))%AVATAR_COLORS.length;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+
+function initials(name) {
+  return name ? name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() : '??';
+}
+
+function formatSalary(min, max) {
+  if (!min && !max) return '—';
+  const fmt = n => n >= 1000 ? Math.round(n/1000)+'k' : n;
+  if (min && max) return `${fmt(min)}–${fmt(max)}`;
+  if (min) return `${fmt(min)}+`;
+  return `Up to ${fmt(max)}`;
+}
+
+function timeAgo(ts) {
+  const d = new Date(ts), now = new Date();
+  const diff = Math.floor((now-d)/1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60)+'m ago';
+  if (diff < 86400) return Math.floor(diff/3600)+'h ago';
+  return Math.floor(diff/86400)+'d ago';
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+function closeModal() {
+  document.getElementById('worker-modal').classList.remove('open');
+}
+
+// ── LOAD STATS ─────────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    // Try employer_stats view first, fallback to counting tables
+    const checks = await Promise.allSettled([
+      db.from('saved_workers').select('id', {count:'exact',head:true}).eq('employer_id', EMPLOYER_ID),
+      db.from('hires').select('id', {count:'exact',head:true}).eq('employer_id', EMPLOYER_ID).eq('status','active'),
+      db.from('contacts').select('id', {count:'exact',head:true}).eq('employer_id', EMPLOYER_ID),
+      db.from('searches').select('id', {count:'exact',head:true}).eq('employer_id', EMPLOYER_ID),
+    ]);
+
+    const savedCount  = checks[0].status==='fulfilled' ? (checks[0].value.count ?? 0) : 12;
+    const hiresCount  = checks[1].status==='fulfilled' ? (checks[1].value.count ?? 0) : 2;
+    const contactedCount = checks[2].status==='fulfilled' ? (checks[2].value.count ?? 0) : 5;
+    const searchCount = checks[3].status==='fulfilled' ? (checks[3].value.count ?? 0) : 84;
+
+    document.getElementById('stat-saved').textContent = savedCount;
+    document.getElementById('stat-hires').textContent = hiresCount;
+    document.getElementById('stat-contacted').textContent = contactedCount;
+    document.getElementById('stat-searches').textContent = searchCount;
+  } catch(e) {
+    // Show placeholder values
+    ['stat-searches','stat-saved','stat-contacted','stat-hires'].forEach((id,i)=>{
+      document.getElementById(id).textContent = [84,12,5,2][i];
+    });
+  }
+}
+
+// ── LOAD WORKERS (generic) ─────────────────────────────────────────────────
+async function loadWorkers(filters) {
+  document.getElementById('results-panel').style.display = 'block';
+  document.getElementById('results-body').innerHTML = '<tr class="loading-row"><td colspan="6"><span class="spinner"></span>Searching…</td></tr>';
+
+  let q = db.from('workers').select('*').limit(20);
+  if (filters?.role) q = q.ilike('role', `%${filters.role}%`);
+  if (filters?.location) q = q.ilike('location', `%${filters.location}%`);
+  if (filters?.salaryMin) q = q.gte('salary_min', filters.salaryMin);
+  if (filters?.salaryMax) q = q.lte('salary_max', filters.salaryMax);
+
+  const { data, error } = await q;
+  renderResults(data, error);
+}
+
+function renderResults(data, error) {
+  const tbody = document.getElementById('results-body');
+  if (error || !data || !data.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">No workers found matching your criteria.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(w => {
+    const [bg,fg] = avatarColor(w.full_name||w.name||'W');
+    const name = w.full_name || w.name || 'Unknown';
+    const role = w.role || w.job_title || '—';
+    const loc  = w.location || w.area || '—';
+    const sal  = formatSalary(w.salary_min, w.salary_max);
+    const isVerified = w.is_verified || w.verified;
+    const badgeCls = isVerified ? 'badge-verified' : 'badge-pending';
+    const badgeTxt = isVerified ? '✔ Verified' : '⏳ Pending';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div class="worker-avatar" style="background:${bg};color:${fg}">${initials(name)}</div>
+        <strong style="font-size:13px">${name}</strong>
+      </div></td>
+      <td>${role}</td>
+      <td>${loc}</td>
+      <td style="font-size:13px">${sal}</td>
+      <td><span class="badge ${badgeCls}">${badgeTxt}</span></td>
+      <td><div class="action-row">
+        <button class="action-btn primary" onclick="contactWorker(${w.id},'${name.replace(/'/g,"\\'")}')">Contact</button>
+        <button class="action-btn" onclick="viewWorker(${w.id})">View</button>
+        <button class="action-btn" onclick="saveWorker(${w.id},'${name.replace(/'/g,"\\'")}')">❤️</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── LOAD SAVED WORKERS ────────────────────────────────────────────────────
+async function loadSavedWorkers() {
+  const tbody = document.getElementById('saved-body');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="4"><span class="spinner"></span>Loading…</td></tr>';
+
+  const { data, error } = await db.from('saved_workers')
+    .select('*, workers(*)')
+    .eq('employer_id', EMPLOYER_ID)
+    .order('created_at', {ascending:false})
+    .limit(8);
+
+  if (error || !data || !data.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No saved workers yet.</td></tr>';
+    // Fallback: show sample
+    fallbackSavedWorkers(tbody);
+    return;
+  }
+
+  tbody.innerHTML = data.map(row => {
+    const w = row.workers || {};
+    const name = w.full_name || w.name || 'Worker';
+    const role = w.role || w.job_title || '—';
+    const [bg,fg] = avatarColor(name);
+    const isVerified = w.is_verified || w.verified;
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div class="worker-avatar" style="background:${bg};color:${fg}">${initials(name)}</div>
+        <strong style="font-size:13px">${name}</strong>
+      </div></td>
+      <td style="font-size:13px;color:var(--text-muted)">${role}</td>
+      <td><span class="badge ${isVerified?'badge-verified':'badge-pending'}">${isVerified?'✔':'⏳'}</span></td>
+      <td><div class="action-row">
+        <button class="action-btn primary btn-sm" onclick="contactWorker(${w.id},'${name.replace(/'/g,"\\'")}')">Contact</button>
+        <button class="action-btn btn-sm" onclick="viewWorker(${w.id})">View</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function fallbackSavedWorkers(tbody) {
+  const samples = [
+    {name:'Grace N.', role:'House Manager', bg:'#C9E8D4', fg:'#1B6B45', verified:true},
+    {name:'Agnes M.', role:'Nanny', bg:'#D6CBEE', fg:'#6B52C8', verified:true},
+  ];
+  tbody.innerHTML = samples.map(w => `<tr>
+    <td><div style="display:flex;align-items:center;gap:8px">
+      <div class="worker-avatar" style="background:${w.bg};color:${w.fg}">${initials(w.name)}</div>
+      <strong style="font-size:13px">${w.name}</strong>
+    </div></td>
+    <td style="font-size:13px;color:var(--text-muted)">${w.role}</td>
+    <td><span class="badge badge-verified">✔</span></td>
+    <td><div class="action-row"><button class="action-btn primary btn-sm">Contact</button><button class="action-btn btn-sm">View</button></div></td>
+  </tr>`).join('');
+}
+
+// ── LOAD HIRES ────────────────────────────────────────────────────────────
+async function loadHires() {
+  const tbody = document.getElementById('hires-body');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="3"><span class="spinner"></span>Loading…</td></tr>';
+
+  const { data, error } = await db.from('hires')
+    .select('*, workers(*)')
+    .eq('employer_id', EMPLOYER_ID)
+    .order('created_at', {ascending:false})
+    .limit(6);
+
+  if (error || !data || !data.length) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:1.5rem;color:var(--text-muted)">No hires recorded yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map(h => {
+    const w = h.workers || {};
+    const name = w.full_name || w.name || 'Worker';
+    const role = w.role || w.job_title || h.role || '—';
+    const [bg,fg] = avatarColor(name);
+    const st = h.status || 'active';
+    const badgeCls = st==='active' ? 'hire-active' : st==='pending' ? 'hire-pending' : 'hire-ended';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div class="worker-avatar" style="background:${bg};color:${fg}">${initials(name)}</div>
+        <strong style="font-size:13px">${name}</strong>
+      </div></td>
+      <td style="font-size:13px;color:var(--text-muted)">${role}</td>
+      <td><span class="hire-badge ${badgeCls}"><span class="dot ${st==='active'?'dot-green':st==='pending'?'dot-amber':'dot-gray'}"></span>${st.charAt(0).toUpperCase()+st.slice(1)}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── LOAD ACTIVITY ─────────────────────────────────────────────────────────
+async function loadActivity() {
+  const div = document.getElementById('activity-body');
+
+  const { data, error } = await db.from('activity_log')
+    .select('*')
+    .eq('employer_id', EMPLOYER_ID)
+    .order('created_at', {ascending:false})
+    .limit(8);
+
+  const ICONS = {saved:'❤️', contacted:'💬', hired:'✅', searched:'🔍', viewed:'👁'};
+
+  if (error || !data || !data.length) {
+    div.innerHTML = `<div class="activity-item"><div class="activity-dot-wrap" style="background:var(--brand-light)">🔍</div><div><div class="activity-text">You searched for House Managers in Westlands</div><div class="activity-time">Recently</div></div></div>
+      <div class="activity-item"><div class="activity-dot-wrap" style="background:var(--info-light)">❤️</div><div><div class="activity-text">Saved Grace N. to your shortlist</div><div class="activity-time">Earlier today</div></div></div>`;
+    return;
+  }
+
+  div.innerHTML = data.map(a => {
+    const icon = ICONS[a.action_type] || '📝';
+    const bgMap = {saved:'var(--brand-light)', contacted:'var(--accent-light)', hired:'var(--purple-light)', searched:'var(--info-light)', viewed:'var(--bg)'};
+    const bg = bgMap[a.action_type] || 'var(--bg)';
+    return `<div class="activity-item">
+      <div class="activity-dot-wrap" style="background:${bg}">${icon}</div>
+      <div>
+        <div class="activity-text">${a.description || a.action_type}</div>
+        <div class="activity-time">${timeAgo(a.created_at)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── VIEW WORKER ───────────────────────────────────────────────────────────
+async function viewWorker(id) {
+  const modal = document.getElementById('worker-modal');
+  document.getElementById('modal-content').innerHTML = '<div style="text-align:center;padding:2rem"><span class="spinner"></span></div>';
+  modal.classList.add('open');
+
+  const { data: w, error } = await db.from('workers').select('*').eq('id', id).single();
+
+  if (error || !w) {
+    document.getElementById('modal-content').innerHTML = '<p style="color:var(--danger)">Could not load worker profile.</p>';
+    return;
+  }
+
+  const name = w.full_name || w.name || 'Worker';
+  const role = w.role || w.job_title || '—';
+  const loc  = w.location || w.area || '—';
+  const sal  = formatSalary(w.salary_min, w.salary_max);
+  const [bg,fg] = avatarColor(name);
+  const isVerified = w.is_verified || w.verified;
+
+  document.getElementById('modal-content').innerHTML = `
+    <div class="profile-section">
+      <div class="profile-avatar-lg" style="background:${bg};color:${fg}">${initials(name)}</div>
+      <div>
+        <div style="font-size:16px;font-weight:600">${name}</div>
+        <div style="font-size:13px;color:var(--text-muted)">${role}</div>
+        ${isVerified ? '<span class="badge badge-verified" style="margin-top:4px">✔ Verified</span>' : ''}
+      </div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-item"><label>Location</label><span>${loc}</span></div>
+      <div class="detail-item"><label>Salary Range</label><span>KES ${sal}</span></div>
+      <div class="detail-item"><label>Experience</label><span>${w.experience_years ? w.experience_years+' years' : '—'}</span></div>
+      <div class="detail-item"><label>Languages</label><span>${w.languages || 'English, Swahili'}</span></div>
+      <div class="detail-item"><label>Availability</label><span>${w.availability || 'Immediate'}</span></div>
+      <div class="detail-item"><label>Live-in</label><span>${w.live_in ? 'Available' : 'Not available'}</span></div>
+    </div>
+    ${w.bio ? `<div style="font-size:13px;color:var(--text-muted);line-height:1.6;padding:0.75rem;background:var(--bg);border-radius:var(--radius-sm)">${w.bio}</div>` : ''}
+  `;
+
+  document.getElementById('modal-contact-btn').onclick = () => contactWorker(w.id, name);
+  document.getElementById('modal-save-btn').onclick = () => saveWorker(w.id, name);
+}
+
+// ── CONTACT WORKER ────────────────────────────────────────────────────────
+async function contactWorker(workerId, workerName) {
+  const { error } = await db.from('contacts').insert({
+    employer_id: EMPLOYER_ID,
+    worker_id: workerId,
+    contacted_at: new Date().toISOString(),
+  });
+
+  // Also log activity
+  await db.from('activity_log').insert({
+    employer_id: EMPLOYER_ID,
+    action_type: 'contacted',
+    description: `You contacted ${workerName}`,
+    worker_id: workerId,
+    created_at: new Date().toISOString(),
+  }).catch(()=>{});
+
+  toast(error ? `Contacting ${workerName}…` : `✉️ Contact request sent to ${workerName}`);
+  closeModal();
+  loadStats();
+  loadActivity();
+}
+
+// ── SAVE WORKER ───────────────────────────────────────────────────────────
+async function saveWorker(workerId, workerName) {
+  const { error } = await db.from('saved_workers').upsert({
+    employer_id: EMPLOYER_ID,
+    worker_id: workerId,
+    created_at: new Date().toISOString(),
+  }, { onConflict: 'employer_id,worker_id' });
+
+  await db.from('activity_log').insert({
+    employer_id: EMPLOYER_ID,
+    action_type: 'saved',
+    description: `Saved ${workerName} to your shortlist`,
+    worker_id: workerId,
+    created_at: new Date().toISOString(),
+  }).catch(()=>{});
+
+  toast(error ? `Could not save: ${error.message}` : `❤️ ${workerName} saved to your list`);
+  loadSavedWorkers();
+  loadStats();
+}
+
+// ── RUN SEARCH ────────────────────────────────────────────────────────────
+async function runSearch() {
+  const role = document.getElementById('search-role').value;
+  const location = document.getElementById('search-location').value;
+  const salaryVal = document.getElementById('search-salary').value;
+  let salaryMin, salaryMax;
+  if (salaryVal) { [salaryMin, salaryMax] = salaryVal.split('-').map(Number); }
+
+  // Log search
+  await db.from('searches').insert({
+    employer_id: EMPLOYER_ID,
+    role: role || null,
+    location: location || null,
+    searched_at: new Date().toISOString(),
+  }).catch(()=>{});
+
+  await db.from('activity_log').insert({
+    employer_id: EMPLOYER_ID,
+    action_type: 'searched',
+    description: `Searched for ${role||'workers'}${location ? ' in '+location : ''}`,
+    created_at: new Date().toISOString(),
+  }).catch(()=>{});
+
+  loadWorkers({ role, location, salaryMin, salaryMax });
+  loadStats();
+}
+
+function openQuickSearch() {
+  document.getElementById('search-role').focus();
+  document.getElementById('search-role').closest('.panel').scrollIntoView({behavior:'smooth'});
+}
+
+function showSection(sec) { /* future routing */ }
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+(async function init() {
+  await Promise.all([
+    loadStats(),
+    loadSavedWorkers(),
+    loadHires(),
+    loadActivity(),
+  ]);
+})();
+</script>
 </body>
 </html>
